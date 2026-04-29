@@ -1,0 +1,69 @@
+import { useState } from 'react'
+import logo from '../../assets/perfil_chopper.png'
+
+
+const NAV = [
+  { href: '#dashboard', label: 'Dashboard', icon: '◈' },
+  { href: '#sales', label: 'Ventas', icon: '◉' },
+  { href: '#new', label: 'Nueva venta', icon: '⊕' },
+]
+
+export const Sidebar = ({ current, onNav }) => {
+  const [collapsed, setCollapsed] = useState(false)
+
+  return (
+    <>
+      {/* Mobile overlay */}
+      <div
+        className={`fixed inset-0 bg-black/50 z-20 lg:hidden ${collapsed ? 'hidden' : 'block'}`}
+        onClick={() => setCollapsed(true)}
+      />
+
+      <aside
+        className={`fixed top-0 left-0 h-full z-30 flex flex-col bg-surface-900 border-r border-white/5 transition-all duration-300 ${collapsed ? 'w-16' : 'w-56'}`}
+      >
+        {/* Logo */}
+        <div className="flex items-center gap-3 px-4 py-5 border-b border-white/5 cursor-pointer" onClick={() => onNav('dashboard')}>
+          <img src={logo} alt="logo" className="w-10 h-10 object-contain rounded-full flex-shrink-0" />
+          {!collapsed && (
+            <div>
+              <p className="font-display font-bold text-white text-sm leading-tight">Streaming</p>
+              <p className="font-display font-bold text-accent-light text-sm leading-tight">Chopper</p>
+            </div>
+          )}
+        </div>
+        {/* Nav */}
+        <nav className="flex-1 py-4 px-2 flex flex-col gap-1">
+          {NAV.map(({ href, label, icon }) => {
+            const active = current === href.slice(1)
+            return (
+              <button
+                key={href}
+                onClick={() => onNav(href.slice(1))}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all w-full text-left ${
+                  active
+                    ? 'bg-accent/20 text-accent-light border border-accent/20'
+                    : 'text-gray-500 hover:text-gray-200 hover:bg-white/5'
+                }`}
+              >
+                <span className="text-lg flex-shrink-0">{icon}</span>
+                {!collapsed && label}
+              </button>
+            )
+          })}
+        </nav>
+
+        {/* Collapse toggle */}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="p-4 text-gray-600 hover:text-gray-300 border-t border-white/5 text-xs transition-colors"
+        >
+          {collapsed ? '▶' : '◀ Colapsar'}
+        </button>
+      </aside>
+
+      {/* Spacer */}
+      <div className={`flex-shrink-0 transition-all duration-300 ${collapsed ? 'w-16' : 'w-56'}`} />
+    </>
+  )
+}
