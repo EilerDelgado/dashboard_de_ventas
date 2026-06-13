@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useSales } from '../../context/SalesContext'
@@ -10,9 +11,10 @@ const titles = {
 
 export const Navbar = () => {
   const { user, signOut } = useAuth()
-  const { sales } = useSales()
+  const { sales, fetchSales } = useSales()
   const location = useLocation()
   const navigate = useNavigate()
+  const [refreshing, setRefreshing] = useState(false)
 
   const title = titles[location.pathname] || 'Streaming Chopper'
 
@@ -25,6 +27,14 @@ export const Navbar = () => {
 
       <div className="flex items-center gap-3">
         <span className="text-xs text-gray-600 hidden sm:block">{user?.email}</span>
+        <button
+          onClick={async () => { setRefreshing(true); await fetchSales(); setRefreshing(false) }}
+          className="text-gray-500 hover:text-gray-300 text-sm px-2 py-2 rounded-lg hover:bg-white/5 transition-all"
+          title="Actualizar datos"
+          disabled={refreshing}
+        >
+          <span className={`inline-block ${refreshing ? 'animate-spin' : ''}`}>↻</span>
+        </button>
         <button
           onClick={() => navigate('/nueva')}
           className="bg-accent hover:bg-accent-dark text-white text-sm font-medium px-4 py-2 rounded-lg transition-all flex items-center gap-2"

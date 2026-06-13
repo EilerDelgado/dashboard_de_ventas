@@ -4,6 +4,7 @@ import { Select } from '../ui/Select'
 import { Button } from '../ui/Button'
 import { SERVICES, ACCOUNT_TYPES, PAYMENT_METHODS, STATUSES } from '../../utils/constants'
 import { calcProfit, formatCurrency } from '../../utils/calculations'
+import { useFormDraft } from '../../hooks/useFormDraft'
 
 const today = () => new Date().toISOString().slice(0, 10)
 
@@ -21,23 +22,26 @@ const initForm = {
 }
 
 export const SaleForm = ({ initial = null, onSubmit, onCancel }) => {
-  const [form, setForm] = useState(
-    initial
-      ? {
-          ...initForm,
-          ...initial,
-          service: SERVICES.includes(initial.service) ? initial.service : 'Otro',
-          serviceCustom: SERVICES.includes(initial.service) ? '' : initial.service,
-          accountType: ACCOUNT_TYPES.includes(initial.accountType) ? initial.accountType : 'Otro',
-          accountTypeCustom: ACCOUNT_TYPES.includes(initial.accountType) ? '' : initial.accountType,
-          purchasePrice: String(initial.purchasePrice),
-          salePrice: String(initial.salePrice),
-        }
-      : initForm
-  )
-  const [errors, setErrors] = useState({})
+  const isEditing = !!initial
 
-  const set = (field, value) => setForm((p) => ({ ...p, [field]: value }))
+  // Preparar valores iniciales (para edición o nuevo)
+  const formInitial = initial
+    ? {
+        ...initForm,
+        ...initial,
+        service: SERVICES.includes(initial.service) ? initial.service : 'Otro',
+        serviceCustom: SERVICES.includes(initial.service) ? '' : initial.service,
+        accountType: ACCOUNT_TYPES.includes(initial.accountType) ? initial.accountType : 'Otro',
+        accountTypeCustom: ACCOUNT_TYPES.includes(initial.accountType) ? '' : initial.accountType,
+        purchasePrice: String(initial.purchasePrice),
+        salePrice: String(initial.salePrice),
+      }
+    : initForm
+
+  // Solo usar draft para formularios nuevos (no edición)
+  const draftKey = isEditing ? `edit_sale_${initial.id}` : 'new_sale'
+  const { form, setField, isDirty, restoredFromDraft, clearDraft, resetForm } = useFormDraft(draftKey, formInitial)
+  const [errors, setErrors] = useState({})
 
   const profit = calcProfit(Number(form.salePrice) || 0, Number(form.purchasePrice) || 0)
 
@@ -65,24 +69,43 @@ export const SaleForm = ({ initial = null, onSubmit, onCancel }) => {
       date: form.date,
       status: form.status,
     })
+    clearDraft()
+  }
+
+  const handleDiscard = () => {
+    resetForm(formInitial)
+    setErrors({})
   }
 
   return (
     <div className="space-y-4">
+      {/* Aviso de borrador restaurado */}
+      {restoredFromDraft && (
+        <div className="flex items-center justify-between px-4 py-3 rounded-xl border border-amber-500/20 bg-amber-500/10">
+          <span className="text-sm text-amber-300">📝 Se restauró un borrador guardado anteriormente</span>
+          <button
+            onClick={handleDiscard}
+            className="text-xs text-amber-400 hover:text-amber-200 underline transition-colors"
+          >
+            Descartar
+          </button>
+        </div>
+      )}
+
       {/* Servicio */}
       <div className="grid grid-cols-2 gap-3">
         <Select
           label="Servicio"
           options={SERVICES}
           value={form.service}
-          onChange={(e) => set('service', e.target.value)}
+          onChange={(e) => setField('service', e.target.value)}
         />
         {form.service === 'Otro' && (
           <Input
             label="Nombre del servicio"
             placeholder="ej. Canva Pro"
             value={form.serviceCustom}
-            onChange={(e) => set('serviceCustom', e.target.value)}
+            onChange={(e) => setField('serviceCustom', e.target.value)}
             error={errors.serviceCustom}
           />
         )}
@@ -94,14 +117,14 @@ export const SaleForm = ({ initial = null, onSubmit, onCancel }) => {
           label="Tipo de cuenta"
           options={ACCOUNT_TYPES}
           value={form.accountType}
-          onChange={(e) => set('accountType', e.target.value)}
+          onChange={(e) => setField('accountType', e.target.value)}
         />
         {form.accountType === 'Otro' && (
           <Input
             label="Tipo personalizado"
             placeholder="ej. Familiar"
             value={form.accountTypeCustom}
-            onChange={(e) => set('accountTypeCustom', e.target.value)}
+            onChange={(e) => setField('accountTypeCustom', e.target.value)}
             error={errors.accountTypeCustom}
           />
         )}
@@ -112,7 +135,7 @@ export const SaleForm = ({ initial = null, onSubmit, onCancel }) => {
         label="Cliente"
         placeholder="Nombre del cliente"
         value={form.clientName}
-        onChange={(e) => set('clientName', e.target.value)}
+        onChange={(e) => setField('clientName', e.target.value)}
         error={errors.clientName}
       />
 
@@ -124,7 +147,7 @@ export const SaleForm = ({ initial = null, onSubmit, onCancel }) => {
           min="0"
           placeholder="0"
           value={form.purchasePrice}
-          onChange={(e) => set('purchasePrice', e.target.value)}
+          onChange={(e) => setField('purchasePrice', e.target.value)}
           error={errors.purchasePrice}
         />
         <Input
@@ -133,7 +156,7 @@ export const SaleForm = ({ initial = null, onSubmit, onCancel }) => {
           min="0"
           placeholder="0"
           value={form.salePrice}
-          onChange={(e) => set('salePrice', e.target.value)}
+          onChange={(e) => setField('salePrice', e.target.value)}
           error={errors.salePrice}
         />
       </div>
@@ -152,20 +175,20 @@ export const SaleForm = ({ initial = null, onSubmit, onCancel }) => {
           label="Método de pago"
           options={PAYMENT_METHODS}
           value={form.paymentMethod}
-          onChange={(e) => set('paymentMethod', e.target.value)}
+          onChange={(e) => setField('paymentMethod', e.target.value)}
         />
         <Input
           label="Fecha"
           type="date"
           value={form.date}
-          onChange={(e) => set('date', e.target.value)}
+          onChange={(e) => setField('date', e.target.value)}
           error={errors.date}
         />
         <Select
           label="Estado"
           options={STATUSES}
           value={form.status}
-          onChange={(e) => set('status', e.target.value)}
+          onChange={(e) => setField('status', e.target.value)}
         />
       </div>
 
