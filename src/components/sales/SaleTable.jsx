@@ -5,6 +5,7 @@ import { Modal } from '../ui/Modal'
 import { SaleForm } from './SaleForm'
 import { formatCurrency } from '../../utils/calculations'
 import { STATUSES } from '../../utils/constants'
+import { Pencil, Trash2 } from 'lucide-react'
 
 export const SaleTable = ({ sales, loading }) => {
   const { updateSale, deleteSale, updateStatus } = useSales()
@@ -116,15 +117,17 @@ export const SaleTable = ({ sales, loading }) => {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setEditing(sale)}
-                      className="text-gray-500 hover:text-accent-light transition-colors text-xs"
+                      className="text-gray-500 hover:text-accent-light transition-colors p-1"
+                      title="Editar"
                     >
-                      ✎
+                      <Pencil className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => setDeleting(sale)}
-                      className="text-gray-500 hover:text-red-400 transition-colors text-xs"
+                      className="text-gray-500 hover:text-red-400 transition-colors p-1"
+                      title="Eliminar"
                     >
-                      ✕
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </td>

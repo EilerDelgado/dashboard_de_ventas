@@ -5,6 +5,8 @@ import { SaleTable } from '../components/sales/SaleTable'
 import { Button } from '../components/ui/Button'
 import { exportToCSV } from '../utils/exportCSV'
 
+import { Download } from 'lucide-react'
+
 export const Sales = () => {
   const { sales, loading } = useSales()
   const { filters, setFilters, filtered, clearFilters } = useFilters(sales)
@@ -18,8 +20,10 @@ export const Sales = () => {
           size="sm"
           onClick={() => exportToCSV(filtered)}
           disabled={!filtered.length}
+          className="flex items-center gap-1.5"
         >
-          ↓ Exportar CSV ({filtered.length})
+          <Download className="w-4 h-4" />
+          <span>Exportar CSV ({filtered.length})</span>
         </Button>
       </div>
 
