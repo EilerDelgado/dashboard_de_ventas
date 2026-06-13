@@ -1,6 +1,19 @@
-import { salesByDay } from '../../utils/calculations'
+import { useState } from 'react'
+import { salesByDay, formatCurrency } from '../../utils/calculations'
+
+const MONTH_NAMES = [
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+]
+
+const formatDateES = (dateStr) => {
+  const [, month, day] = dateStr.split('-')
+  return `${day} ${MONTH_NAMES[parseInt(month, 10) - 1]}`
+}
 
 export const SalesByDayChart = ({ sales }) => {
+  const [hoveredIdx, setHoveredIdx] = useState(null)
+
   const data = salesByDay(sales, 14)
   const maxRevenue = Math.max(...data.map((d) => d.revenue), 1)
   const W = 480
@@ -21,8 +34,12 @@ export const SalesByDayChart = ({ sales }) => {
   const areaRevenue = `${padL},${H - padB} ` + revenuePoints + ` ${W - padR},${H - padB}`
   const areaProfit = `${padL},${H - padB} ` + profitPoints + ` ${W - padR},${H - padB}`
 
+  // Tooltip position as percentage of the SVG width/height
+  const tooltipLeft = hoveredIdx !== null ? (toX(hoveredIdx) / W) * 100 : 0
+  const tooltipTop = hoveredIdx !== null ? (toY(data[hoveredIdx].revenue) / H) * 100 : 0
+
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="w-full overflow-x-auto relative">
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ minWidth: 280 }}>
         <defs>
           <linearGradient id="gradRev" x1="0" y1="0" x2="0" y2="1">
@@ -53,13 +70,59 @@ export const SalesByDayChart = ({ sales }) => {
           )
         })}
 
-        {/* Dots */}
+        {/* Visible dots */}
         {data.map((d, i) =>
           d.count > 0 ? (
-            <circle key={i} cx={toX(i)} cy={toY(d.revenue)} r="2.5" fill="#a78bfa" />
+            <circle
+              key={`dot-${i}`}
+              cx={toX(i)}
+              cy={toY(d.revenue)}
+              r={hoveredIdx === i ? 4 : 2.5}
+              fill="#a78bfa"
+              className="transition-all duration-150"
+            />
+          ) : null
+        )}
+
+        {/* Invisible larger hover targets */}
+        {data.map((d, i) =>
+          d.count > 0 ? (
+            <circle
+              key={`hover-${i}`}
+              cx={toX(i)}
+              cy={toY(d.revenue)}
+              r="12"
+              fill="transparent"
+              onMouseEnter={() => setHoveredIdx(i)}
+              onMouseLeave={() => setHoveredIdx(null)}
+              className="cursor-pointer"
+            />
           ) : null
         )}
       </svg>
+
+      {/* Tooltip */}
+      {hoveredIdx !== null && data[hoveredIdx] && (
+        <div
+          className="absolute pointer-events-none bg-surface-900 border border-white/10 rounded-xl shadow-xl px-3 py-2 text-xs z-50"
+          style={{
+            left: `${tooltipLeft}%`,
+            top: `${tooltipTop}%`,
+            transform: `translate(${tooltipLeft > 75 ? '-100%' : tooltipLeft < 25 ? '0%' : '-50%'}, -110%)`,
+          }}
+        >
+          <p className="font-semibold text-white mb-1">{formatDateES(data[hoveredIdx].date)}</p>
+          <p className="text-gray-400">
+            Ventas: <span className="text-white">{data[hoveredIdx].count}</span>
+          </p>
+          <p className="text-gray-400">
+            Ingresos: <span className="text-violet-400">{formatCurrency(data[hoveredIdx].revenue)}</span>
+          </p>
+          <p className="text-gray-400">
+            Ganancia: <span className="text-emerald-400">{formatCurrency(data[hoveredIdx].profit)}</span>
+          </p>
+        </div>
+      )}
 
       <div className="flex gap-4 mt-1 text-xs text-gray-500">
         <span className="flex items-center gap-1.5"><span className="w-3 h-0.5 bg-violet-400 inline-block" />Ingresos</span>
