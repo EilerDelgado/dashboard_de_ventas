@@ -4,8 +4,8 @@ import { SaleForm } from '../components/sales/SaleForm'
 export const NewSale = ({ onAfterSave }) => {
   const { addSale } = useSales()
 
-  const handleSubmit = (data) => {
-    addSale(data)
+  const handleSubmit = async (data) => {
+    await addSale(data)
     onAfterSave()
   }
 

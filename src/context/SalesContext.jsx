@@ -22,6 +22,7 @@ const toDB = (data, userId) => ({
   account_type:   data.accountType,
   purchase_price: data.purchasePrice,
   sale_price:     data.salePrice,
+  profit:         data.salePrice - data.purchasePrice,
   client_name:    data.clientName,
   payment_method: data.paymentMethod,
   sale_date:      data.date,
@@ -79,6 +80,7 @@ export const SalesProvider = ({ children }) => {
       .update({
         service: data.service, account_type: data.accountType,
         purchase_price: data.purchasePrice, sale_price: data.salePrice,
+        profit: data.salePrice - data.purchasePrice,
         client_name: data.clientName, payment_method: data.paymentMethod,
         sale_date: data.date, status: data.status,
       })
