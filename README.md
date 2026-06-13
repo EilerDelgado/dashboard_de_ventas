@@ -25,9 +25,12 @@ VITE_SUPABASE_ANON_KEY=tu_clave
 ## Qué hace
 
 - Registra ventas con todos los datos (servicio, cliente, precios, método de pago)
-- Calcula la ganancia automáticamente
-- Filtra por servicio, estado, fecha o cliente
-- Dashboard con totales y gráficas
+- Calcula la ganancia automáticamente y previene pérdida de datos con guardado automático de borradores
+- Filtra por servicio, estado, fecha o cliente, además de búsqueda global en tiempo real
+- Dashboard con KPIs enriquecidos (márgenes, ticket promedio), gráficas interactivas con tooltips y resumen de insights
+- Tabla de ventas con paginación integrada
+- Interfaz completamente responsiva para móviles con menú lateral desplegable
+- Control de errores robusto con Error Boundary y validaciones amigables de entorno
 - Exporta lo que ves a CSV
 - Cada admin solo ve sus propias ventas
 
