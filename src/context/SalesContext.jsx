@@ -36,6 +36,7 @@ export const SalesProvider = ({ children }) => {
   const [sales, setSales]     = useState([])
   const [loading, setLoading] = useState(true)
   const [toast, setToast]     = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type, id: Date.now() })
@@ -105,7 +106,10 @@ export const SalesProvider = ({ children }) => {
   }
 
   return (
-    <SalesContext.Provider value={{ sales, loading, addSale, updateSale, deleteSale, updateStatus, clearAllSales, toast, fetchSales }}>
+    <SalesContext.Provider value={{
+      sales, loading, addSale, updateSale, deleteSale, updateStatus, clearAllSales, toast, fetchSales,
+      searchQuery, setSearchQuery
+    }}>
       {children}
     </SalesContext.Provider>
   )

@@ -11,12 +11,20 @@ const titles = {
 
 export const Navbar = ({ onMenuClick }) => {
   const { user, signOut } = useAuth()
-  const { sales, fetchSales } = useSales()
+  const { sales, fetchSales, searchQuery, setSearchQuery } = useSales()
   const location = useLocation()
   const navigate = useNavigate()
   const [refreshing, setRefreshing] = useState(false)
 
   const title = titles[location.pathname] || 'Streaming Chopper'
+
+  const handleSearchChange = (e) => {
+    const val = e.target.value
+    setSearchQuery(val)
+    if (location.pathname !== '/ventas') {
+      navigate('/ventas')
+    }
+  }
 
   return (
     <header className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-surface-950/80 backdrop-blur border-b border-white/5">
@@ -32,6 +40,16 @@ export const Navbar = ({ onMenuClick }) => {
           <h1 className="font-display font-bold text-xl text-white">{title}</h1>
           <p className="text-xs text-gray-500">{sales.length} Ventas registradas</p>
         </div>
+      </div>
+
+      <div className="mx-4">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          placeholder="Buscar..."
+          className="bg-surface-900 border border-white/5 text-xs text-white rounded-lg px-3 py-1.5 focus:outline-none focus:border-accent w-48 sm:w-64 placeholder-gray-500"
+        />
       </div>
 
       <div className="flex items-center gap-3">

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useBlocker } from 'react-router-dom'
 
 /**
  * Hook para guardar borradores de formulario en localStorage.
@@ -90,6 +91,25 @@ export const useFormDraft = (key, initialValues) => {
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [isDirty])
+
+  // Interceptar navegación por React Router si hay cambios sin guardar
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      isDirty && currentLocation.pathname !== nextLocation.pathname
+  )
+
+  useEffect(() => {
+    if (blocker.state === 'blocked') {
+      const hasConfirmed = window.confirm("Tienes cambios sin guardar. ¿Deseas salir?")
+      if (hasConfirmed) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        clearDraft()
+        blocker.proceed()
+      } else {
+        blocker.reset()
+      }
+    }
+  }, [blocker.state, clearDraft, blocker])
 
   // Limpiar timer al desmontar
   useEffect(() => {

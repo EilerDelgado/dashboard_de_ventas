@@ -6,7 +6,7 @@ import { SaleForm } from './SaleForm'
 import { formatCurrency } from '../../utils/calculations'
 import { STATUSES } from '../../utils/constants'
 
-export const SaleTable = ({ sales }) => {
+export const SaleTable = ({ sales, loading }) => {
   const { updateSale, deleteSale, updateStatus } = useSales()
   const [editing, setEditing] = useState(null)
   const [deleting, setDeleting] = useState(null)
@@ -18,6 +18,40 @@ export const SaleTable = ({ sales }) => {
   // Reset currentPage to 1 whenever sales array length or rowsPerPage changes
   const [prevSalesLength, setPrevSalesLength] = useState(sales.length)
   const [prevRowsPerPage, setPrevRowsPerPage] = useState(rowsPerPage)
+
+  if (loading) {
+    return (
+      <div className="overflow-x-auto rounded-xl border border-white/5 animate-pulse">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-white/5 bg-surface-900/50">
+              {['Servicio', 'Tipo', 'Cliente', 'Compra', 'Venta', 'Ganancia', 'Pago', 'Fecha', 'Estado', ''].map((h) => (
+                <th key={h} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[...Array(5)].map((_, i) => (
+              <tr key={i} className={`border-b border-white/5 ${i % 2 === 0 ? 'bg-surface-900/20' : ''}`}>
+                <td className="px-4 py-3"><div className="h-4 bg-white/10 rounded w-24" /></td>
+                <td className="px-4 py-3"><div className="h-4 bg-white/5 rounded w-16" /></td>
+                <td className="px-4 py-3"><div className="h-4 bg-white/5 rounded w-20" /></td>
+                <td className="px-4 py-3"><div className="h-4 bg-white/5 rounded w-12" /></td>
+                <td className="px-4 py-3"><div className="h-4 bg-white/5 rounded w-12" /></td>
+                <td className="px-4 py-3"><div className="h-4 bg-white/5 rounded w-12" /></td>
+                <td className="px-4 py-3"><div className="h-4 bg-white/5 rounded w-16" /></td>
+                <td className="px-4 py-3"><div className="h-4 bg-white/5 rounded w-20" /></td>
+                <td className="px-4 py-3"><div className="h-4 bg-white/5 rounded w-16" /></td>
+                <td className="px-4 py-3"><div className="h-4 bg-white/5 rounded w-8" /></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
 
   if (sales.length !== prevSalesLength || rowsPerPage !== prevRowsPerPage) {
     setPrevSalesLength(sales.length)

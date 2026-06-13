@@ -6,7 +6,7 @@ import { Button } from '../components/ui/Button'
 import { exportToCSV } from '../utils/exportCSV'
 
 export const Sales = () => {
-  const { sales } = useSales()
+  const { sales, loading } = useSales()
   const { filters, setFilters, filtered, clearFilters } = useFilters(sales)
 
   return (
@@ -23,7 +23,7 @@ export const Sales = () => {
         </Button>
       </div>
 
-      <SaleTable sales={filtered} />
+      <SaleTable sales={filtered} loading={loading} />
     </div>
   )
 }

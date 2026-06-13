@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Outlet, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { SalesProvider } from './context/SalesContext'
 import { useAuth } from './hooks/useAuth'
@@ -32,11 +32,7 @@ const ProtectedLayout = () => {
         <div className="flex-1 flex flex-col min-w-0">
           <Navbar onMenuClick={() => setSidebarOpen(true)} />
           <main className="flex-1">
-            <Routes>
-              <Route index element={<Dashboard />} />
-              <Route path="ventas" element={<Sales />} />
-              <Route path="nueva" element={<NewSale />} />
-            </Routes>
+            <Outlet />
           </main>
         </div>
         <Toast />
@@ -58,6 +54,35 @@ const PublicRoute = () => {
 
   return <Login />
 }
+
+const router = createBrowserRouter([
+  {
+    path: '/login',
+    element: <PublicRoute />,
+  },
+  {
+    path: '/',
+    element: <ProtectedLayout />,
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
+      },
+      {
+        path: 'ventas',
+        element: <Sales />,
+      },
+      {
+        path: 'nueva',
+        element: <NewSale />,
+      },
+    ],
+  },
+  {
+    path: '*',
+    element: <Navigate to="/" replace />,
+  },
+])
 
 export default function App() {
   if (!isSupabaseConfigured) {
@@ -113,14 +138,9 @@ VITE_SUPABASE_ANON_KEY=tu_clave_anonima_de_supabase_aqui`}
 
   return (
     <ErrorBoundary>
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/login" element={<PublicRoute />} />
-            <Route path="/*" element={<ProtectedLayout />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </ErrorBoundary>
   )
 }

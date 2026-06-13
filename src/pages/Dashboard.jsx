@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useSales } from '../context/SalesContext'
-import { calcTotals, topService, topDay, salesByService, formatCurrency } from '../utils/calculations'
+import { calcTotals, topService, topDay, formatCurrency } from '../utils/calculations'
 import { StatCard } from '../components/dashboard/StatCard'
 import { TopServiceChart } from '../components/dashboard/TopServiceChart'
 import { SalesByDayChart } from '../components/dashboard/SalesByDayChart'
@@ -40,8 +40,62 @@ const generateInsights = (sales, totals, best, bestDay) => {
 }
 
 export const Dashboard = () => {
-  const { sales, clearAllSales } = useSales()
+  const { sales, clearAllSales, loading } = useSales()
   const [confirmClear, setConfirmClear] = useState(false)
+
+  if (loading) {
+    return (
+      <div className="p-6 space-y-6">
+        {/* Stats grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="animate-pulse bg-surface-900 border border-white/5 rounded-2xl p-5 flex flex-col gap-2 h-[114px]">
+              <div className="h-4 bg-white/5 rounded w-16" />
+              <div className="h-8 bg-white/10 rounded w-24" />
+              <div className="h-3 bg-white/5 rounded w-20" />
+            </div>
+          ))}
+        </div>
+
+        {/* Insights Skeleton */}
+        <div className="animate-pulse bg-surface-900 rounded-2xl border border-white/5 p-5 space-y-3">
+          <div className="h-4 bg-white/10 rounded w-36" />
+          <div className="grid sm:grid-cols-2 gap-3">
+            <div className="h-4 bg-white/5 rounded w-3/4" />
+            <div className="h-4 bg-white/5 rounded w-2/3" />
+            <div className="h-4 bg-white/5 rounded w-5/6" />
+            <div className="h-4 bg-white/5 rounded w-1/2" />
+          </div>
+        </div>
+
+        {/* Charts Skeleton */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          <div className="animate-pulse bg-surface-900 rounded-2xl border border-white/5 p-5 space-y-4">
+            <div className="h-4 bg-white/10 rounded w-32" />
+            <div className="h-[120px] bg-white/5 rounded w-full" />
+            <div className="flex gap-4 mt-1">
+              <div className="h-3 bg-white/5 rounded w-16" />
+              <div className="h-3 bg-white/5 rounded w-16" />
+            </div>
+          </div>
+          <div className="animate-pulse bg-surface-900 rounded-2xl border border-white/5 p-5 space-y-4">
+            <div className="h-4 bg-white/10 rounded w-28" />
+            <div className="space-y-3">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="space-y-1.5">
+                  <div className="flex justify-between">
+                    <div className="h-3 bg-white/5 rounded w-20" />
+                    <div className="h-3 bg-white/5 rounded w-32" />
+                  </div>
+                  <div className="w-full h-2 bg-white/5 rounded-full" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const totals = calcTotals(sales)
   const { totalSales, totalRevenue, totalCost, totalProfit } = totals
