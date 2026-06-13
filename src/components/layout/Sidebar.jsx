@@ -1,14 +1,14 @@
+import { NavLink, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import logo from '../../assets/perfil_chopper.png'
 
-
 const NAV = [
-  { href: '#dashboard', label: 'Dashboard', icon: '◈' },
-  { href: '#sales', label: 'Ventas', icon: '◉' },
-  { href: '#new', label: 'Nueva venta', icon: '⊕' },
+  { to: '/',       label: 'Dashboard', icon: '◈' },
+  { to: '/ventas', label: 'Ventas',    icon: '◉' },
+  { to: '/nueva',  label: 'Nueva venta', icon: '⊕' },
 ]
 
-export const Sidebar = ({ current, onNav }) => {
+export const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
@@ -23,7 +23,7 @@ export const Sidebar = ({ current, onNav }) => {
         className={`fixed top-0 left-0 h-full z-30 flex flex-col bg-surface-900 border-r border-white/5 transition-all duration-300 ${collapsed ? 'w-16' : 'w-56'}`}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-4 py-5 border-b border-white/5 cursor-pointer" onClick={() => onNav('dashboard')}>
+        <NavLink to="/" className="flex items-center gap-3 px-4 py-5 border-b border-white/5">
           <img src={logo} alt="logo" className="w-10 h-10 object-contain rounded-full flex-shrink-0" />
           {!collapsed && (
             <div>
@@ -31,26 +31,26 @@ export const Sidebar = ({ current, onNav }) => {
               <p className="font-display font-bold text-accent-light text-sm leading-tight">Chopper</p>
             </div>
           )}
-        </div>
+        </NavLink>
         {/* Nav */}
         <nav className="flex-1 py-4 px-2 flex flex-col gap-1">
-          {NAV.map(({ href, label, icon }) => {
-            const active = current === href.slice(1)
-            return (
-              <button
-                key={href}
-                onClick={() => onNav(href.slice(1))}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all w-full text-left ${
-                  active
+          {NAV.map(({ to, label, icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={to === '/'}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all w-full text-left ${
+                  isActive
                     ? 'bg-accent/20 text-accent-light border border-accent/20'
                     : 'text-gray-500 hover:text-gray-200 hover:bg-white/5'
-                }`}
-              >
-                <span className="text-lg flex-shrink-0">{icon}</span>
-                {!collapsed && label}
-              </button>
-            )
-          })}
+                }`
+              }
+            >
+              <span className="text-lg flex-shrink-0">{icon}</span>
+              {!collapsed && label}
+            </NavLink>
+          ))}
         </nav>
 
         {/* Collapse toggle */}

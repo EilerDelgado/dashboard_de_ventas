@@ -1,12 +1,14 @@
+import { useNavigate } from 'react-router-dom'
 import { useSales } from '../context/SalesContext'
 import { SaleForm } from '../components/sales/SaleForm'
 
-export const NewSale = ({ onAfterSave }) => {
+export const NewSale = () => {
   const { addSale } = useSales()
+  const navigate = useNavigate()
 
   const handleSubmit = async (data) => {
     await addSale(data)
-    onAfterSave()
+    navigate('/ventas')
   }
 
   return (

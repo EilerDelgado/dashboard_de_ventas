@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../hooks/useAuth'
 
 const SalesContext = createContext(null)
 
@@ -31,25 +32,15 @@ const toDB = (data, userId) => ({
 })
 
 export const SalesProvider = ({ children }) => {
+  const { user } = useAuth()
   const [sales, setSales]     = useState([])
   const [loading, setLoading] = useState(true)
-  const [user, setUser]       = useState(null)
   const [toast, setToast]     = useState(null)
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type, id: Date.now() })
     setTimeout(() => setToast(null), 3000)
   }
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-    })
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      setUser(session?.user ?? null)
-    })
-    return () => subscription.unsubscribe()
-  }, [])
 
   const fetchSales = useCallback(async () => {
     if (!user) { setSales([]); setLoading(false); return }
@@ -114,7 +105,7 @@ export const SalesProvider = ({ children }) => {
   }
 
   return (
-    <SalesContext.Provider value={{ sales, loading, user, addSale, updateSale, deleteSale, updateStatus, clearAllSales, toast }}>
+    <SalesContext.Provider value={{ sales, loading, addSale, updateSale, deleteSale, updateStatus, clearAllSales, toast, fetchSales }}>
       {children}
     </SalesContext.Provider>
   )
