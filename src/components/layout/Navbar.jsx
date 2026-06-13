@@ -11,101 +11,97 @@ const titles = {
 
 export const Navbar = ({ onMenuClick }) => {
   const { user, signOut } = useAuth()
-  const { sales, fetchSales, searchQuery, setSearchQuery } = useSales()
+  const { sales, fetchSales } = useSales()
   const location = useLocation()
   const navigate = useNavigate()
   const [refreshing, setRefreshing] = useState(false)
 
   const title = titles[location.pathname] || 'Streaming Chopper'
 
-  const handleSearchChange = (e) => {
-    const val = e.target.value
-    setSearchQuery(val)
-    if (location.pathname !== '/ventas') {
-      navigate('/ventas')
-    }
-  }
-
   return (
-    <header className="sticky top-0 z-10 bg-surface-950/80 backdrop-blur border-b border-white/5 px-4 py-3 sm:px-6 sm:py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      {/* Fila superior: Hamburguesa + Título + Botones de acción móviles */}
-      <div className="flex items-center justify-between w-full sm:w-auto">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onMenuClick}
-            className="lg:hidden text-gray-400 hover:text-white text-xl p-1 focus:outline-none"
-            aria-label="Abrir menú"
-          >
-            ☰
-          </button>
-          <div>
-            <h1 className="font-display font-bold text-lg sm:text-xl text-white whitespace-nowrap">{title}</h1>
-            <p className="text-[10px] sm:text-xs text-gray-500 hidden sm:block">{sales.length} Ventas registradas</p>
-          </div>
+    <header className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4 bg-surface-950/80 backdrop-blur border-b border-white/5">
+      {/* Sección Izquierda: Hamburguesa + Título */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden text-gray-400 hover:text-white text-xl p-1 focus:outline-none"
+          aria-label="Abrir menú"
+        >
+          ☰
+        </button>
+        <div>
+          <h1 className="font-display font-bold text-lg sm:text-xl text-white whitespace-nowrap">{title}</h1>
+          <p className="text-[10px] sm:text-xs text-gray-500 hidden sm:block">{sales.length} Ventas registradas</p>
         </div>
+      </div>
 
-        {/* Botones de acción rápidos para celular */}
-        <div className="flex items-center gap-2 sm:hidden">
+      {/* Sección Derecha: Botones de Acción (Mobile & Desktop) */}
+      <div className="flex items-center gap-2">
+        {/* Botones para Móvil (sm:hidden) */}
+        <div className="flex sm:hidden items-center gap-2">
           <button
             onClick={async () => { setRefreshing(true); await fetchSales(); setRefreshing(false) }}
-            className="text-gray-400 hover:text-white text-sm p-2 rounded-lg bg-surface-900 border border-white/5 transition-all"
+            className="text-gray-400 hover:text-white p-2 rounded-xl bg-surface-900 border border-white/5 hover:bg-white/5 active:bg-white/10 transition-all flex items-center justify-center w-9 h-9"
             title="Actualizar datos"
             disabled={refreshing}
           >
-            <span className={`inline-block ${refreshing ? 'animate-spin' : ''}`}>↻</span>
+            <svg className={`w-4.5 h-4.5 ${refreshing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M21 3v5h-5" />
+            </svg>
           </button>
           <button
             onClick={() => navigate('/nueva')}
-            className="bg-accent hover:bg-accent-dark text-white text-sm p-2 rounded-lg transition-all"
+            className="bg-accent hover:bg-accent-dark text-white p-2 rounded-xl transition-all flex items-center justify-center w-9 h-9 shadow-lg shadow-accent/20"
             title="Nueva venta"
           >
-            ⊕
+            <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
+            </svg>
           </button>
           <button
             onClick={signOut}
-            className="text-gray-400 hover:text-red-400 text-sm p-2 rounded-lg bg-surface-900 border border-white/5 transition-all"
+            className="text-gray-400 hover:text-red-400 p-2 rounded-xl bg-surface-900 border border-white/5 hover:bg-red-500/10 hover:border-red-500/20 transition-all flex items-center justify-center w-9 h-9"
             title="Cerrar sesión"
           >
-            ⎋
+            <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
           </button>
         </div>
-      </div>
 
-      {/* Barra de búsqueda: Segunda fila en móviles, Centro en escritorio */}
-      <div className="w-full sm:w-auto sm:flex-1 sm:mx-6">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          placeholder="Buscar..."
-          className="bg-surface-900 border border-white/5 text-xs text-white rounded-lg px-3 py-2 focus:outline-none focus:border-accent w-full sm:max-w-xs placeholder-gray-500 transition-all"
-        />
-      </div>
-
-      {/* Botones de acción completos para pantallas medianas/grandes */}
-      <div className="hidden sm:flex items-center gap-3">
-        <span className="text-xs text-gray-600 hidden md:block">{user?.email}</span>
-        <button
-          onClick={async () => { setRefreshing(true); await fetchSales(); setRefreshing(false) }}
-          className="text-gray-500 hover:text-gray-300 text-sm px-2 py-2 rounded-lg hover:bg-white/5 transition-all"
-          title="Actualizar datos"
-          disabled={refreshing}
-        >
-          <span className={`inline-block ${refreshing ? 'animate-spin' : ''}`}>↻</span>
-        </button>
-        <button
-          onClick={() => navigate('/nueva')}
-          className="bg-accent hover:bg-accent-dark text-white text-sm font-medium px-4 py-2 rounded-lg transition-all flex items-center gap-2 whitespace-nowrap"
-        >
-          <span>⊕</span> Nueva venta
-        </button>
-        <button
-          onClick={signOut}
-          className="text-gray-500 hover:text-gray-300 text-sm px-3 py-2 rounded-lg hover:bg-white/5 transition-all whitespace-nowrap"
-          title="Cerrar sesión"
-        >
-          ⎋ Salir
-        </button>
+        {/* Botones para Desktop (hidden sm:flex) */}
+        <div className="hidden sm:flex items-center gap-3">
+          <span className="text-xs text-gray-600 hidden md:block">{user?.email}</span>
+          <button
+            onClick={async () => { setRefreshing(true); await fetchSales(); setRefreshing(false) }}
+            className="text-gray-400 hover:text-white p-2 rounded-xl bg-surface-900 border border-white/5 hover:bg-white/5 transition-all flex items-center justify-center w-9 h-9"
+            title="Actualizar datos"
+            disabled={refreshing}
+          >
+            <svg className={`w-4.5 h-4.5 ${refreshing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M21 3v5h-5" />
+            </svg>
+          </button>
+          <button
+            onClick={() => navigate('/nueva')}
+            className="bg-accent hover:bg-accent-dark text-white text-sm font-medium px-4 py-2 rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-accent/20"
+          >
+            <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Nueva venta</span>
+          </button>
+          <button
+            onClick={signOut}
+            className="text-gray-500 hover:text-red-400 text-sm px-3 py-2 rounded-xl bg-surface-900 border border-white/5 hover:bg-red-500/10 hover:border-red-500/20 transition-all flex items-center gap-2"
+            title="Cerrar sesión"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span>Salir</span>
+          </button>
+        </div>
       </div>
     </header>
   )
