@@ -1,5 +1,5 @@
 export const SERVICES = [
-  'Netflix', 'Disney+ Estandar','Disney+ Primium', 'HBO Max', 'Amazon Prime Video', 'Paramount+',
+  'Netflix', 'Disney+ Estandar','Disney+ Premium', 'HBO Max', 'Amazon Prime Video', 'Paramount+',
     'Crunchyroll', 'Spotify', 'YouTube Premium', 'Vix', 'Plex', 'Directv Go', 'Claro Video', 'Win Sports', 
     'Canva Pro', 'CapCut', 'ChatGPT Plus'
 ]
@@ -20,4 +20,3 @@ export const STATUS_COLORS = {
   cancelada: 'bg-red-500/20 text-red-400 border-red-500/30',
 }
 
-export const STORAGE_KEY = 'streaming_sales_v1'

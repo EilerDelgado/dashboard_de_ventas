@@ -92,7 +92,7 @@ export const SalesProvider = ({ children }) => {
     const { error } = await supabase.from('sales').delete().eq('id', id)
     if (error) { showToast('Error al eliminar', 'error'); return }
     setSales((prev) => prev.filter((s) => s.id !== id))
-    showToast('Venta eliminada', 'error')
+    showToast('Venta eliminada', 'success')
   }
 
   const updateStatus = async (id, status) => {
@@ -108,7 +108,7 @@ export const SalesProvider = ({ children }) => {
     const { error } = await supabase.from('sales').delete().eq('created_by', user.id)
     if (error) { showToast('Error al limpiar datos', 'error'); return }
     setSales([])
-    showToast('Todos los datos eliminados', 'error')
+    showToast('Todos los datos eliminados', 'success')
   }
 
   return (
