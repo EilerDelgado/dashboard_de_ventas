@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import { useSales } from '../../context/SalesContext'
-import { Badge } from '../ui/Badge'
 import { Button } from '../ui/Button'
 import { Modal } from '../ui/Modal'
-import { Select } from '../ui/Select'
 import { SaleForm } from './SaleForm'
 import { formatCurrency } from '../../utils/calculations'
 import { STATUSES } from '../../utils/constants'
@@ -13,6 +11,20 @@ export const SaleTable = ({ sales }) => {
   const [editing, setEditing] = useState(null)
   const [deleting, setDeleting] = useState(null)
 
+  // Local state for pagination
+  const [currentPage, setCurrentPage] = useState(1)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
+
+  // Reset currentPage to 1 whenever sales array length or rowsPerPage changes
+  const [prevSalesLength, setPrevSalesLength] = useState(sales.length)
+  const [prevRowsPerPage, setPrevRowsPerPage] = useState(rowsPerPage)
+
+  if (sales.length !== prevSalesLength || rowsPerPage !== prevRowsPerPage) {
+    setPrevSalesLength(sales.length)
+    setPrevRowsPerPage(rowsPerPage)
+    setCurrentPage(1)
+  }
+
   if (!sales.length)
     return (
       <div className="text-center py-16 text-gray-600">
@@ -20,6 +32,13 @@ export const SaleTable = ({ sales }) => {
         <p>Sin ventas registradas</p>
       </div>
     )
+
+  // Calculations
+  const totalPages = Math.ceil(sales.length / rowsPerPage)
+  const paginatedSales = sales.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+
+  const startRow = (currentPage - 1) * rowsPerPage + 1
+  const endRow = Math.min(currentPage * rowsPerPage, sales.length)
 
   return (
     <>
@@ -35,7 +54,7 @@ export const SaleTable = ({ sales }) => {
             </tr>
           </thead>
           <tbody>
-            {sales.map((sale, i) => (
+            {paginatedSales.map((sale, i) => (
               <tr
                 key={sale.id}
                 className={`border-b border-white/5 transition-colors hover:bg-white/3 ${i % 2 === 0 ? 'bg-surface-900/20' : ''}`}
@@ -81,6 +100,45 @@ export const SaleTable = ({ sales }) => {
         </table>
       </div>
 
+      {/* Pagination controls */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 px-1 py-2 text-sm text-gray-400">
+        <div className="flex items-center gap-2">
+          <span>Filas por página:</span>
+          <select
+            value={rowsPerPage}
+            onChange={(e) => setRowsPerPage(Number(e.target.value))}
+            className="bg-surface-900 border border-white/10 rounded-md px-2 py-1 focus:outline-none focus:border-accent cursor-pointer text-white"
+          >
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+          </select>
+        </div>
+
+        <div>
+          <span>
+            Mostrando {startRow}-{endRow} de {sales.length} ventas
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1.5 rounded-md bg-surface-900 border border-white/10 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-white"
+          >
+            Anterior
+          </button>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1.5 rounded-md bg-surface-900 border border-white/10 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-white"
+          >
+            Siguiente
+          </button>
+        </div>
+      </div>
+
       {/* Edit modal */}
       <Modal open={!!editing} onClose={() => setEditing(null)} title="Editar venta">
         {editing && (
@@ -112,3 +170,4 @@ export const SaleTable = ({ sales }) => {
     </>
   )
 }
+

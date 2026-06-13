@@ -9,7 +9,7 @@ const titles = {
   '/nueva':  'Nueva venta',
 }
 
-export const Navbar = () => {
+export const Navbar = ({ onMenuClick }) => {
   const { user, signOut } = useAuth()
   const { sales, fetchSales } = useSales()
   const location = useLocation()
@@ -20,9 +20,18 @@ export const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-surface-950/80 backdrop-blur border-b border-white/5">
-      <div>
-        <h1 className="font-display font-bold text-xl text-white">{title}</h1>
-        <p className="text-xs text-gray-500">{sales.length} Ventas registradas</p>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden text-gray-400 hover:text-white text-xl p-1 focus:outline-none"
+          aria-label="Abrir menú"
+        >
+          ☰
+        </button>
+        <div>
+          <h1 className="font-display font-bold text-xl text-white">{title}</h1>
+          <p className="text-xs text-gray-500">{sales.length} Ventas registradas</p>
+        </div>
       </div>
 
       <div className="flex items-center gap-3">

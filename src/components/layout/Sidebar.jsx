@@ -8,22 +8,26 @@ const NAV = [
   { to: '/nueva',  label: 'Nueva venta', icon: '⊕' },
 ]
 
-export const Sidebar = () => {
+export const Sidebar = ({ isOpen, setIsOpen }) => {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
     <>
       {/* Mobile overlay */}
       <div
-        className={`fixed inset-0 bg-black/50 z-20 lg:hidden ${collapsed ? 'hidden' : 'block'}`}
-        onClick={() => setCollapsed(true)}
+        className={`fixed inset-0 bg-black/50 z-20 lg:hidden transition-opacity duration-300 ${
+          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setIsOpen(false)}
       />
 
       <aside
-        className={`fixed top-0 left-0 h-full z-30 flex flex-col bg-surface-900 border-r border-white/5 transition-all duration-300 ${collapsed ? 'w-16' : 'w-56'}`}
+        className={`fixed top-0 left-0 h-full z-30 flex flex-col bg-surface-900 border-r border-white/5 transition-all duration-300 lg:translate-x-0 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        } ${collapsed ? 'w-16' : 'w-56'}`}
       >
         {/* Logo */}
-        <NavLink to="/" className="flex items-center gap-3 px-4 py-5 border-b border-white/5">
+        <NavLink to="/" onClick={() => setIsOpen(false)} className="flex items-center gap-3 px-4 py-5 border-b border-white/5">
           <img src={logo} alt="logo" className="w-10 h-10 object-contain rounded-full flex-shrink-0" />
           {!collapsed && (
             <div>
@@ -39,6 +43,7 @@ export const Sidebar = () => {
               key={to}
               to={to}
               end={to === '/'}
+              onClick={() => setIsOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all w-full text-left ${
                   isActive
@@ -63,7 +68,7 @@ export const Sidebar = () => {
       </aside>
 
       {/* Spacer */}
-      <div className={`flex-shrink-0 transition-all duration-300 ${collapsed ? 'w-16' : 'w-56'}`} />
+      <div className={`hidden lg:block flex-shrink-0 transition-all duration-300 ${collapsed ? 'w-16' : 'w-56'}`} />
     </>
   )
 }
