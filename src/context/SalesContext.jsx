@@ -23,7 +23,6 @@ const toDB = (data, userId) => ({
   account_type:   data.accountType,
   purchase_price: data.purchasePrice,
   sale_price:     data.salePrice,
-  profit:         data.salePrice - data.purchasePrice,
   client_name:    data.clientName,
   payment_method: data.paymentMethod,
   sale_date:      data.date,
@@ -50,8 +49,12 @@ export const SalesProvider = ({ children }) => {
       .from('sales')
       .select('*')
       .order('sale_date', { ascending: false })
-    if (error) showToast('Error al cargar ventas', 'error')
-    else setSales(data.map(fromDB))
+    if (error) {
+      console.error('Error al cargar ventas:', error)
+      showToast('Error al cargar ventas', 'error')
+    } else {
+      setSales(data.map(fromDB))
+    }
     setLoading(false)
   }, [user])
 
@@ -61,7 +64,11 @@ export const SalesProvider = ({ children }) => {
     if (!user) return
     const { data: inserted, error } = await supabase
       .from('sales').insert(toDB(data, user.id)).select().single()
-    if (error) { showToast('Error al guardar venta', 'error'); return }
+    if (error) {
+      console.error('Error al guardar venta:', error)
+      showToast('Error al guardar venta', 'error')
+      return
+    }
     setSales((prev) => [fromDB(inserted), ...prev])
     showToast('Venta registrada correctamente')
   }
@@ -72,19 +79,26 @@ export const SalesProvider = ({ children }) => {
       .update({
         service: data.service, account_type: data.accountType,
         purchase_price: data.purchasePrice, sale_price: data.salePrice,
-        profit: data.salePrice - data.purchasePrice,
         client_name: data.clientName, payment_method: data.paymentMethod,
         sale_date: data.date, status: data.status,
       })
       .eq('id', id).select().single()
-    if (error) { showToast('Error al actualizar', 'error'); return }
+    if (error) {
+      console.error('Error al actualizar venta:', error)
+      showToast('Error al actualizar', 'error')
+      return
+    }
     setSales((prev) => prev.map((s) => (s.id === id ? fromDB(updated) : s)))
     showToast('Venta actualizada')
   }
 
   const deleteSale = async (id) => {
     const { error } = await supabase.from('sales').delete().eq('id', id)
-    if (error) { showToast('Error al eliminar', 'error'); return }
+    if (error) {
+      console.error('Error al eliminar venta:', error)
+      showToast('Error al eliminar', 'error')
+      return
+    }
     setSales((prev) => prev.filter((s) => s.id !== id))
     showToast('Venta eliminada', 'success')
   }
@@ -92,7 +106,11 @@ export const SalesProvider = ({ children }) => {
   const updateStatus = async (id, status) => {
     const { data: updated, error } = await supabase
       .from('sales').update({ status }).eq('id', id).select().single()
-    if (error) { showToast('Error al cambiar estado', 'error'); return }
+    if (error) {
+      console.error('Error al cambiar estado de venta:', error)
+      showToast('Error al cambiar estado', 'error')
+      return
+    }
     setSales((prev) => prev.map((s) => (s.id === id ? fromDB(updated) : s)))
     showToast(`Estado cambiado a "${status}"`)
   }
@@ -100,7 +118,11 @@ export const SalesProvider = ({ children }) => {
   const clearAllSales = async () => {
     if (!user) return
     const { error } = await supabase.from('sales').delete().eq('created_by', user.id)
-    if (error) { showToast('Error al limpiar datos', 'error'); return }
+    if (error) {
+      console.error('Error al limpiar todas las ventas:', error)
+      showToast('Error al limpiar datos', 'error')
+      return
+    }
     setSales([])
     showToast('Todos los datos eliminados', 'success')
   }

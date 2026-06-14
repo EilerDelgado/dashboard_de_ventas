@@ -40,7 +40,7 @@ export const SaleForm = ({ initial = null, onSubmit, onCancel }) => {
 
   // Solo usar draft para formularios nuevos (no edición)
   const draftKey = isEditing ? `edit_sale_${initial.id}` : 'new_sale'
-  const { form, setField, isDirty, restoredFromDraft, clearDraft, resetForm } = useFormDraft(draftKey, formInitial)
+  const { form, setField, restoredFromDraft, clearDraft, resetForm } = useFormDraft(draftKey, formInitial)
   const [errors, setErrors] = useState({})
 
   const profit = calcProfit(Number(form.salePrice) || 0, Number(form.purchasePrice) || 0)

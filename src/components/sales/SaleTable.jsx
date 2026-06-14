@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSales } from '../../context/SalesContext'
 import { Button } from '../ui/Button'
 import { Modal } from '../ui/Modal'
@@ -17,8 +17,9 @@ export const SaleTable = ({ sales, loading }) => {
   const [rowsPerPage, setRowsPerPage] = useState(10)
 
   // Reset currentPage to 1 whenever sales array length or rowsPerPage changes
-  const [prevSalesLength, setPrevSalesLength] = useState(sales.length)
-  const [prevRowsPerPage, setPrevRowsPerPage] = useState(rowsPerPage)
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [sales.length, rowsPerPage])
 
   if (loading) {
     return (
@@ -54,11 +55,7 @@ export const SaleTable = ({ sales, loading }) => {
     )
   }
 
-  if (sales.length !== prevSalesLength || rowsPerPage !== prevRowsPerPage) {
-    setPrevSalesLength(sales.length)
-    setPrevRowsPerPage(rowsPerPage)
-    setCurrentPage(1)
-  }
+
 
   if (!sales.length)
     return (

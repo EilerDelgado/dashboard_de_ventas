@@ -102,7 +102,6 @@ export const useFormDraft = (key, initialValues) => {
     if (blocker.state === 'blocked') {
       const hasConfirmed = window.confirm("Tienes cambios sin guardar. ¿Deseas salir?")
       if (hasConfirmed) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         clearDraft()
         blocker.proceed()
       } else {
